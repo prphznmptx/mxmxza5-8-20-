@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Link, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
@@ -8,6 +8,7 @@ import ServicesHomePage from "./pages/ServicesHomePage";
 import HomePage from "./pages/HomePage";
 import { supabase, useSupabaseAuth } from "./lib/supabase";
 import { RewardsPointsProvider } from "./lib/rewardsPointsContext";
+import { useHotelTenant } from "./lib/hotelTenant";
 import {
   cacheHomeIdentity,
   getCachedHomeIdentity,
@@ -128,6 +129,22 @@ function RoleAwareHomePage() {
   return <><ServicesHomePage role={role === "manager" ? "manager" : "worker"} displayName={displayName} /><ServicesFooter /></>;
 }
 
+function CompactFooter() {
+  const { tenant } = useHotelTenant();
+
+  return (
+    <footer className="border-t bg-background text-muted-foreground">
+      <div className="container flex flex-col gap-2 py-4 text-xs sm:flex-row sm:items-center sm:justify-between">
+        <span>© {new Date().getFullYear()} {tenant?.name || "IvyTowers"}. All rights reserved.</span>
+        <nav aria-label="Legal links" className="flex gap-4">
+          <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
+          <Link to="/terms" className="hover:text-foreground">Terms</Link>
+        </nav>
+      </div>
+    </footer>
+  );
+}
+
 function RouteAwareFooter() {
   const { pathname } = useLocation();
   const guestFooterPaths = [
@@ -158,9 +175,8 @@ function RouteAwareFooter() {
   ];
   const matchesPath = (paths: string[]) => paths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 
-  if (pathname.startsWith("/events/operations/")) return <ServicesFooter />;
-  if (matchesPath(serviceFooterPaths)) return <ServicesFooter />;
-  if (matchesPath(guestFooterPaths)) return <Footer />;
+  if (pathname.startsWith("/events/operations/")) return <CompactFooter />;
+  if (matchesPath(serviceFooterPaths) || matchesPath(guestFooterPaths)) return <CompactFooter />;
   return null;
 }
 
