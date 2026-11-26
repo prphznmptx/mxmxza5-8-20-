@@ -145,11 +145,7 @@ function CompactFooter({ audience }: { audience: "guest" | "staff" }) {
         { icon: MapPin, text: "Operations Center, Management City" },
       ];
   const links = isGuest
-    ? [
-        { label: "Book Your Stay", to: "/book" },
-        { label: "Digital Menu", to: "/menu" },
-        { label: "Share Your Experience", to: "/reviews" },
-      ]
+    ? [{ label: "Share Your Experience", to: "/reviews" }]
     : [
         { label: "Account Settings", to: "/profile" },
         { label: "Help Center", to: "/profile" },
