@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import Header from "./components/layout/Header";
 import ServicesFooter from "./components/layout/ServicesFooter";
@@ -127,6 +127,28 @@ function RoleAwareHomePage() {
   return <ServicesHomePage role={role === "manager" ? "manager" : "worker"} displayName={displayName} />;
 }
 
+function RouteAwareServicesFooter() {
+  const { pathname } = useLocation();
+  const footerPaths = [
+    "/staff",
+    "/management",
+    "/platform/hotels",
+    "/profile",
+    "/tasks",
+    "/reports",
+    "/accounts",
+    "/books",
+    "/workers",
+    "/billing",
+    "/offers/manage",
+    "/spa/manage",
+  ];
+  const shouldShowFooter = footerPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`))
+    || pathname.startsWith("/events/operations/");
+
+  return shouldShowFooter ? <ServicesFooter /> : null;
+}
+
 function App() {
   return (
     <RewardsPointsProvider>
@@ -186,7 +208,7 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
-          <ServicesFooter />
+          <RouteAwareServicesFooter />
           <Toaster />
             <ToastRenderer />
           </div>
