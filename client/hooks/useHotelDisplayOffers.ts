@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useHotelTenant } from "../lib/hotelTenant";
-import { supabase } from "../lib/supabase";
 
 export type HotelDisplayOffer = {
   title: string;
@@ -34,15 +33,9 @@ export function useHotelDisplayOffers(placement: "home_carousel" | "menu_banner"
       }
     };
 
-    const channel = supabase
-      .channel(`hotel-display-offers:${tenant.organizationId}`)
-      .on("broadcast", { event: "offers_changed" }, () => { void loadOffers(); })
-      .subscribe();
-
     void loadOffers();
     return () => {
       active = false;
-      void supabase.removeChannel(channel);
     };
   }, [placement, tenant?.organizationId]);
 
