@@ -9,6 +9,7 @@ import HomePage from "./pages/HomePage";
 import { supabase, useSupabaseAuth } from "./lib/supabase";
 import { RewardsPointsProvider } from "./lib/rewardsPointsContext";
 import { useHotelTenant } from "./lib/hotelTenant";
+import { Mail, MapPin, Phone } from "lucide-react";
 import {
   cacheHomeIdentity,
   getCachedHomeIdentity,
@@ -129,17 +130,58 @@ function RoleAwareHomePage() {
   return <><ServicesHomePage role={role === "manager" ? "manager" : "worker"} displayName={displayName} /><ServicesFooter /></>;
 }
 
-function CompactFooter() {
+function CompactFooter({ audience }: { audience: "guest" | "staff" }) {
   const { tenant } = useHotelTenant();
+  const isGuest = audience === "guest";
+  const contactDetails = isGuest
+    ? [
+        { icon: Phone, text: "+1 (555) SPECIAL" },
+        { icon: Mail, text: "special@sheraton.com" },
+        { icon: MapPin, text: "Luxury District, Premium City" },
+      ]
+    : [
+        { icon: Phone, text: "+1 (555) OPERATIONS" },
+        { icon: Mail, text: "support@serviceplatform.com" },
+        { icon: MapPin, text: "Operations Center, Management City" },
+      ];
+  const links = isGuest
+    ? [
+        { label: "Book Your Stay", to: "/book" },
+        { label: "Digital Menu", to: "/menu" },
+        { label: "Share Your Experience", to: "/reviews" },
+      ]
+    : [
+        { label: "Account Settings", to: "/profile" },
+        { label: "Help Center", to: "/profile" },
+      ];
 
   return (
-    <footer className="border-t bg-background text-muted-foreground">
-      <div className="container flex flex-col gap-2 py-4 text-xs sm:flex-row sm:items-center sm:justify-between">
-        <span>© {new Date().getFullYear()} {tenant?.name || "IvyTowers"}. All rights reserved.</span>
-        <nav aria-label="Legal links" className="flex gap-4">
-          <Link to="/privacy" className="hover:text-foreground">Privacy</Link>
-          <Link to="/terms" className="hover:text-foreground">Terms</Link>
-        </nav>
+    <footer className="bg-sheraton-navy text-white">
+      <div className="container space-y-4 py-6">
+        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-2 text-sm text-gray-200 sm:flex-row sm:flex-wrap sm:gap-x-6">
+            {contactDetails.map(({ icon: Icon, text }) => (
+              <span key={text} className="flex items-center gap-2">
+                <Icon className="h-4 w-4 shrink-0 text-sheraton-gold" />
+                {text}
+              </span>
+            ))}
+          </div>
+          <nav aria-label={isGuest ? "Guest links" : "Staff support links"} className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+            {links.map(({ label, to }) => (
+              <Link key={label} to={to} className="text-gray-200 transition-colors hover:text-sheraton-gold">
+                {label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+        <div className="flex flex-col gap-2 border-t border-white/15 pt-3 text-xs text-gray-300 sm:flex-row sm:items-center sm:justify-between">
+          <span>© {new Date().getFullYear()} {tenant?.name || (isGuest ? "IvyTowers" : "Service Platform")}. All rights reserved.</span>
+          <nav aria-label="Legal links" className="flex gap-4">
+            <Link to="/privacy" className="hover:text-white">Privacy</Link>
+            <Link to="/terms" className="hover:text-white">Terms</Link>
+          </nav>
+        </div>
       </div>
     </footer>
   );
@@ -175,8 +217,9 @@ function RouteAwareFooter() {
   ];
   const matchesPath = (paths: string[]) => paths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 
-  if (pathname.startsWith("/events/operations/")) return <CompactFooter />;
-  if (matchesPath(serviceFooterPaths) || matchesPath(guestFooterPaths)) return <CompactFooter />;
+  if (pathname.startsWith("/events/operations/")) return <CompactFooter audience="staff" />;
+  if (matchesPath(serviceFooterPaths)) return <CompactFooter audience="staff" />;
+  if (matchesPath(guestFooterPaths)) return <CompactFooter audience="guest" />;
   return null;
 }
 
