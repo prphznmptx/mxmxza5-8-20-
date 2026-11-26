@@ -161,7 +161,7 @@ const requireHotelManager = async (request: Request) => {
   try {
     [profiles, memberships] = await Promise.all([
       readService<Array<{ role: string }>>(`user_profiles?user_id=eq.${userFilter}&select=role&limit=1`),
-      readService<Array<{ role: string }>>(`books_memberships?organization_id=eq.${organizationId}&user_id=eq.${userFilter}&role=in.(owner,admin)&select=role&limit=1`),
+      readService<Array<{ role: string }>>(`books_memberships?organization_id=eq.${organizationId}&user_id=eq.${userFilter}&role=in.(owner,admin,manager)&select=role&limit=1`),
     ]);
   } catch {
     throw hotelOfferError("Hotel manager access could not be verified", 503);
@@ -603,6 +603,150 @@ export const saveHotelOffer: RequestHandler = async (request, response) => {
     const status = (error as Error & { status?: number }).status
       ?? (error instanceof Error && error.message.includes("Authentication") ? 401 : 400);
     response.status(status).json({ error: error instanceof Error ? error.message : "Hotel offer could not be saved" });
+  }
+};
+
+const validateHotelDisplayOffer = (value: unknown) => {
+  const input = value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+  const placement = input.placement;
+  const title = typeof input.title === "string" ? input.title.trim() : "";
+  const description = typeof input.description === "string" ? input.description.trim() : "";
+  const displayOrder = Number(input.display_order);
+  if ((placement !== "home_carousel" && placement !== "menu_banner") || !title || title.length > 120 || !description || description.length > 2000 || !Number.isInteger(displayOrder) || displayOrder < 0 || typeof input.is_active !== "boolean") {
+    throw hotelOfferError("Offer details are invalid", 400);
+  }
+
+  if (placement === "home_carousel") {
+    if (typeof input.badge_text !== "string" || !["Crown", "Utensils", "Coffee"].includes(String(input.icon_key)) || !["gold", "green", "purple"].includes(String(input.icon_color))) {
+      throw hotelOfferError("Home offer details are invalid", 400);
+    }
+    return {
+      placement,
+      title,
+      description,
+      badge_text: input.badge_text,
+      icon_key: input.icon_key,
+      icon_color: input.icon_color,
+      emoji: null,
+      daily_start_time: null,
+      daily_end_time: null,
+      display_order: displayOrder,
+      is_active: input.is_active,
+    };
+  }
+
+  const timePattern = /^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/;
+  if (typeof input.emoji !== "string" || !input.emoji.trim() || typeof input.daily_start_time !== "string" || !timePattern.test(input.daily_start_time) || typeof input.daily_end_time !== "string" || !timePattern.test(input.daily_end_time)) {
+    throw hotelOfferError("Menu banner details are invalid", 400);
+  }
+  const startMinutes = input.daily_start_time.split(":").slice(0, 2).map(Number).reduce((total, part) => total * 60 + part);
+  const endMinutes = input.daily_end_time.split(":").slice(0, 2).map(Number).reduce((total, part) => total * 60 + part);
+  if (startMinutes >= endMinutes) throw hotelOfferError("Menu offer end time must follow its start time", 400);
+  return {
+    placement,
+    title,
+    description,
+    badge_text: null,
+    icon_key: null,
+    icon_color: null,
+    emoji: input.emoji,
+    daily_start_time: input.daily_start_time,
+    daily_end_time: input.daily_end_time,
+    display_order: displayOrder,
+    is_active: input.is_active,
+  };
+};
+
+export const getHotelDisplayOffersForManagement: RequestHandler = async (request, response) => {
+  try {
+    const tenant = await requireHotelManager(request);
+    const organizationId = encodeURIComponent(tenant.organizationId);
+    const offers = await readService<Array<Record<string, unknown>>>(
+      `hotel_display_offers?organization_id=eq.${organizationId}&select=id,organization_id,placement,title,description,badge_text,icon_key,icon_color,emoji,daily_start_time,daily_end_time,display_order,is_active&order=placement,display_order`,
+    );
+    setPrivateTenantResponse(response);
+    response.json({ offers });
+  } catch (error) {
+    const status = (error as Error & { status?: number }).status
+      ?? (error instanceof Error && error.message.includes("Authentication") ? 401 : 503);
+    response.status(status).json({ error: error instanceof Error ? error.message : "Hotel offers could not be loaded" });
+  }
+};
+
+export const saveHotelDisplayOffer: RequestHandler = async (request, response) => {
+  try {
+    const tenant = await requireHotelManager(request);
+    const body = request.body as Record<string, unknown>;
+    const offerId = body.id;
+    if (offerId !== undefined && (typeof offerId !== "string" || !isUuid(offerId))) {
+      response.status(400).json({ error: "Offer identifier is invalid" });
+      return;
+    }
+    const offer = validateHotelDisplayOffer(body);
+    const organizationId = encodeURIComponent(tenant.organizationId);
+    if (typeof offerId === "string") {
+      const updated = await writeService<Array<{ id: string }>>(
+        `hotel_display_offers?id=eq.${encodeURIComponent(offerId)}&organization_id=eq.${organizationId}&select=id`,
+        "PATCH",
+        { ...offer, updated_at: new Date().toISOString() },
+      );
+      if (!updated.length) throw hotelOfferError("Offer was not found for this hotel", 404);
+    } else {
+      await writeService("hotel_display_offers?select=id", "POST", { ...offer, organization_id: tenant.organizationId });
+    }
+    setPrivateTenantResponse(response);
+    response.json({ ok: true });
+  } catch (error) {
+    const status = (error as Error & { status?: number }).status
+      ?? (error instanceof Error && error.message.includes("Authentication") ? 401 : 400);
+    response.status(status).json({ error: error instanceof Error ? error.message : "Hotel offer could not be saved" });
+  }
+};
+
+export const deleteHotelDisplayOffer: RequestHandler = async (request, response) => {
+  try {
+    const tenant = await requireHotelManager(request);
+    const offerId = request.params.offerId;
+    if (!isUuid(offerId)) {
+      response.status(400).json({ error: "Offer identifier is invalid" });
+      return;
+    }
+    const { supabaseUrl } = configuration();
+    const organizationId = encodeURIComponent(tenant.organizationId);
+    const deleteResponse = await fetch(`${supabaseUrl}/rest/v1/hotel_display_offers?id=eq.${encodeURIComponent(offerId)}&organization_id=eq.${organizationId}&select=id`, {
+      method: "DELETE",
+      headers: { ...serviceHeaders(), Prefer: "return=representation" },
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!deleteResponse.ok) throw hotelOfferError("Offer could not be deleted", 503);
+    const deleted = await deleteResponse.json() as Array<{ id: string }>;
+    if (!deleted.length) throw hotelOfferError("Offer was not found for this hotel", 404);
+    setPrivateTenantResponse(response);
+    response.json({ ok: true });
+  } catch (error) {
+    const status = (error as Error & { status?: number }).status
+      ?? (error instanceof Error && error.message.includes("Authentication") ? 401 : 400);
+    response.status(status).json({ error: error instanceof Error ? error.message : "Hotel offer could not be deleted" });
+  }
+};
+
+export const getPublicHotelDisplayOffers: RequestHandler = async (request, response) => {
+  const placement = request.query.placement;
+  if (placement !== "home_carousel" && placement !== "menu_banner") {
+    response.status(400).json({ error: "Offer placement is invalid" });
+    return;
+  }
+
+  try {
+    const tenant = await resolveRequestHotelTenant(request);
+    const organizationId = encodeURIComponent(tenant.organizationId);
+    const offers = await readService<Array<Record<string, unknown>>>(
+      `hotel_display_offers?organization_id=eq.${organizationId}&placement=eq.${placement}&is_active=eq.true&select=title,description,badge_text,icon_key,icon_color,emoji,daily_start_time,daily_end_time,display_order&order=display_order.asc`,
+    );
+    setPrivateTenantResponse(response);
+    response.json({ offers });
+  } catch (error) {
+    response.status(404).json({ error: error instanceof Error ? error.message : "Hotel offers could not be loaded" });
   }
 };
 

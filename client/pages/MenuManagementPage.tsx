@@ -39,6 +39,45 @@ const emptyForm = {
 };
 
 type FormState = typeof emptyForm;
+type DisplayOfferPlacement = "home_carousel" | "menu_banner";
+type DisplayOffer = {
+  id: string;
+  placement: DisplayOfferPlacement;
+  title: string;
+  description: string;
+  badge_text: string | null;
+  icon_key: "Crown" | "Utensils" | "Coffee" | null;
+  icon_color: "gold" | "green" | "purple" | null;
+  emoji: string | null;
+  daily_start_time: string | null;
+  daily_end_time: string | null;
+  display_order: number;
+  is_active: boolean;
+};
+type DisplayOfferForm = Omit<DisplayOffer, "id">;
+const emptyDisplayOffer: DisplayOfferForm = {
+  placement: "home_carousel",
+  title: "",
+  description: "",
+  badge_text: "",
+  icon_key: "Crown",
+  icon_color: "gold",
+  emoji: "🍽️",
+  daily_start_time: "11:00",
+  daily_end_time: "15:00",
+  display_order: 0,
+  is_active: true,
+};
+
+const fetchDisplayOffers = async (accessToken: string) => {
+  const response = await fetch("/api/hotel-display-offers/manage", {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    cache: "no-store",
+  });
+  const payload = await response.json().catch(() => null) as { offers?: DisplayOffer[]; error?: string } | null;
+  if (!response.ok || !Array.isArray(payload?.offers)) throw new Error(payload?.error || "Offers could not be loaded.");
+  return payload.offers;
+};
 
 type PendingMenuWorker = {
   user_id: string;
@@ -74,6 +113,11 @@ const MenuManagementPage = () => {
   const [isManager, setIsManager] = useState(false);
   const [pendingWorkers, setPendingWorkers] = useState<PendingMenuWorker[]>([]);
   const [items, setItems] = useState<MenuItem[]>([]);
+  const [displayOffers, setDisplayOffers] = useState<DisplayOffer[]>([]);
+  const [displayOfferForm, setDisplayOfferForm] = useState<DisplayOfferForm>(emptyDisplayOffer);
+  const [editingDisplayOfferId, setEditingDisplayOfferId] = useState<string | null>(null);
+  const [displayOfferError, setDisplayOfferError] = useState("");
+  const [isSavingDisplayOffer, setIsSavingDisplayOffer] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -100,7 +144,7 @@ const MenuManagementPage = () => {
 
       const [{ data: profile }, { data: membership }] = await Promise.all([
         supabase.from("user_profiles").select("role, menu_access_role, menu_access_approved, hotel_organization_id").eq("user_id", user.id).maybeSingle(),
-        supabase.from("books_memberships").select("role").eq("user_id", user.id).eq("organization_id", tenant.organizationId).in("role", ["owner", "admin"]).maybeSingle(),
+        supabase.from("books_memberships").select("role").eq("user_id", user.id).eq("organization_id", tenant.organizationId).in("role", ["owner", "admin", "manager"]).maybeSingle(),
       ]);
       const manager = profile?.role === "manager" && Boolean(membership);
       const approvedWorker = profile && isWorkerRole(profile.role)
@@ -155,6 +199,25 @@ const MenuManagementPage = () => {
     if (authorized === false) navigate("/menu", { replace: true });
   }, [authorized, navigate]);
 
+  useEffect(() => {
+    let active = true;
+    setDisplayOffers([]);
+    setDisplayOfferError("");
+    if (!isManager || !tenant) return () => { active = false; };
+
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) return;
+      try {
+        const offers = await fetchDisplayOffers(session.access_token);
+        if (active) setDisplayOffers(offers);
+      } catch (error) {
+        if (active) setDisplayOfferError(error instanceof Error ? error.message : "Offers could not be loaded.");
+      }
+    });
+
+    return () => { active = false; };
+  }, [isManager, tenant?.organizationId]);
+
   if (authorized === null) {
     return <div className="min-h-screen" aria-busy="true" />;
   }
@@ -184,6 +247,65 @@ const MenuManagementPage = () => {
   const resetForm = () => {
     setForm(emptyForm);
     setEditingId(null);
+  };
+
+  const updateDisplayOfferField = <K extends keyof DisplayOfferForm>(key: K, value: DisplayOfferForm[K]) => {
+    setDisplayOfferForm((current) => ({ ...current, [key]: value }));
+  };
+
+  const resetDisplayOfferForm = () => {
+    setDisplayOfferForm({ ...emptyDisplayOffer, display_order: displayOffers.length });
+    setEditingDisplayOfferId(null);
+    setDisplayOfferError("");
+  };
+
+  const saveDisplayOffer = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!tenant || !isManager || isSavingDisplayOffer) return;
+    setIsSavingDisplayOffer(true);
+    setDisplayOfferError("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Sign in with a hotel manager account to manage offers.");
+      const response = await fetch("/api/hotel-display-offers/manage", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session.access_token}`, "content-type": "application/json" },
+        body: JSON.stringify({ ...displayOfferForm, ...(editingDisplayOfferId ? { id: editingDisplayOfferId } : {}) }),
+      });
+      const payload = await response.json().catch(() => null) as { error?: string } | null;
+      if (!response.ok) throw new Error(payload?.error || "Offer could not be saved.");
+      setDisplayOffers(await fetchDisplayOffers(session.access_token));
+      resetDisplayOfferForm();
+    } catch (error) {
+      setDisplayOfferError(error instanceof Error ? error.message : "Offer could not be saved.");
+    } finally {
+      setIsSavingDisplayOffer(false);
+    }
+  };
+
+  const editDisplayOffer = (offer: DisplayOffer) => {
+    setEditingDisplayOfferId(offer.id);
+    setDisplayOfferForm({ ...offer });
+    setDisplayOfferError("");
+  };
+
+  const removeDisplayOffer = async (offerId: string) => {
+    if (!tenant || !isManager) return;
+    setDisplayOfferError("");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Sign in with a hotel manager account to manage offers.");
+      const response = await fetch(`/api/hotel-display-offers/manage/${encodeURIComponent(offerId)}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const payload = await response.json().catch(() => null) as { error?: string } | null;
+      if (!response.ok) throw new Error(payload?.error || "Offer could not be deleted.");
+      setDisplayOffers(await fetchDisplayOffers(session.access_token));
+      if (editingDisplayOfferId === offerId) resetDisplayOfferForm();
+    } catch (error) {
+      setDisplayOfferError(error instanceof Error ? error.message : "Offer could not be deleted.");
+    }
   };
 
   const saveKitchenStatus = async (event: React.FormEvent) => {
@@ -457,6 +579,33 @@ const MenuManagementPage = () => {
                   </div>
                 ))
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {isManager && (
+          <Card>
+            <CardHeader><CardTitle>Home and Menu Offers</CardTitle><p className="text-sm text-muted-foreground">Manage the special offer cards shown on the Home page and the timed banner shown on the Menu page.</p></CardHeader>
+            <CardContent className="space-y-5">
+              {displayOfferError && <p role="alert" className="rounded-md border border-destructive/30 p-3 text-sm">{displayOfferError}</p>}
+              <form onSubmit={(event) => void saveDisplayOffer(event)} className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="space-y-2"><Label htmlFor="display-offer-placement">Shown on</Label><select id="display-offer-placement" className="h-10 w-full rounded-md border bg-background px-3 text-sm" value={displayOfferForm.placement} onChange={(event) => updateDisplayOfferField("placement", event.target.value as DisplayOfferPlacement)}><option value="home_carousel">Home rotating cards</option><option value="menu_banner">Menu timed banner</option></select></div>
+                <div className="space-y-2"><Label htmlFor="display-offer-order">Display order</Label><Input id="display-offer-order" type="number" min="0" step="1" value={displayOfferForm.display_order} onChange={(event) => updateDisplayOfferField("display_order", Number(event.target.value))} required /></div>
+                <div className="space-y-2"><Label htmlFor="display-offer-title">Title</Label><Input id="display-offer-title" value={displayOfferForm.title} onChange={(event) => updateDisplayOfferField("title", event.target.value)} maxLength={120} required /></div>
+                <div className="space-y-2 md:col-span-2"><Label htmlFor="display-offer-description">Description</Label><Textarea id="display-offer-description" value={displayOfferForm.description} onChange={(event) => updateDisplayOfferField("description", event.target.value)} maxLength={2000} required /></div>
+                {displayOfferForm.placement === "home_carousel" ? <>
+                  <div className="space-y-2"><Label htmlFor="display-offer-badge">Badge text</Label><Input id="display-offer-badge" value={displayOfferForm.badge_text || ""} onChange={(event) => updateDisplayOfferField("badge_text", event.target.value)} maxLength={80} required /></div>
+                  <div className="space-y-2"><Label htmlFor="display-offer-icon">Icon</Label><select id="display-offer-icon" className="h-10 w-full rounded-md border bg-background px-3 text-sm" value={displayOfferForm.icon_key || "Crown"} onChange={(event) => updateDisplayOfferField("icon_key", event.target.value as DisplayOfferForm["icon_key"])}><option value="Crown">Crown</option><option value="Utensils">Utensils</option><option value="Coffee">Coffee</option></select></div>
+                  <div className="space-y-2"><Label htmlFor="display-offer-color">Icon color</Label><select id="display-offer-color" className="h-10 w-full rounded-md border bg-background px-3 text-sm" value={displayOfferForm.icon_color || "gold"} onChange={(event) => updateDisplayOfferField("icon_color", event.target.value as DisplayOfferForm["icon_color"])}><option value="gold">Gold</option><option value="green">Green</option><option value="purple">Purple</option></select></div>
+                </> : <>
+                  <div className="space-y-2"><Label htmlFor="display-offer-emoji">Banner icon</Label><Input id="display-offer-emoji" value={displayOfferForm.emoji || ""} onChange={(event) => updateDisplayOfferField("emoji", event.target.value)} maxLength={8} required /></div>
+                  <div className="space-y-2"><Label htmlFor="display-offer-start">Starts at</Label><Input id="display-offer-start" type="time" value={displayOfferForm.daily_start_time || ""} onChange={(event) => updateDisplayOfferField("daily_start_time", event.target.value)} required /></div>
+                  <div className="space-y-2"><Label htmlFor="display-offer-end">Ends at</Label><Input id="display-offer-end" type="time" value={displayOfferForm.daily_end_time || ""} onChange={(event) => updateDisplayOfferField("daily_end_time", event.target.value)} required /></div>
+                </>}
+                <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={displayOfferForm.is_active} onChange={(event) => updateDisplayOfferField("is_active", event.target.checked)} />Published</label>
+                <div className="flex gap-2 md:col-span-2"><Button type="submit" disabled={isSavingDisplayOffer}>{isSavingDisplayOffer ? "Saving..." : editingDisplayOfferId ? "Save offer" : "Add offer"}</Button>{editingDisplayOfferId && <Button type="button" variant="outline" onClick={resetDisplayOfferForm}>Cancel</Button>}</div>
+              </form>
+              <div className="space-y-3">{displayOffers.map((offer) => <div key={offer.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-3"><div><p className="font-medium">{offer.title} <span className="text-xs text-muted-foreground">· {offer.placement === "home_carousel" ? "Home" : "Menu"}</span></p><p className="text-sm text-muted-foreground">{offer.description} · {offer.is_active ? "Published" : "Hidden"}</p></div><div className="flex gap-2"><Button type="button" size="sm" variant="outline" onClick={() => editDisplayOffer(offer)}>Edit</Button><Button type="button" size="sm" variant="ghost" className="text-destructive" onClick={() => void removeDisplayOffer(offer.id)}>Delete</Button></div></div>)}</div>
             </CardContent>
           </Card>
         )}

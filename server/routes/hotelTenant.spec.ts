@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getHotelOffersForManagement, getHotelRewards, getPublicHotelOffers, resolveRequestHotelTenant } from "./hotelTenant.js";
+import { getHotelDisplayOffersForManagement, getHotelOffersForManagement, getHotelRewards, getPublicHotelOffers, getPublicHotelDisplayOffers, resolveRequestHotelTenant } from "./hotelTenant.js";
 
 const organizationId = "1665de0b-1848-4862-940f-4dcc02b30a2b";
 const request = { hostname: "abc123.projects.builder.my" } as Parameters<typeof resolveRequestHotelTenant>[0];
@@ -151,6 +151,94 @@ describe("getHotelOffersForManagement", () => {
 
     expect(result.statusCode).toBe(403);
     expect(result.body).toEqual({ error: "Only a hotel manager can manage offers" });
+  });
+});
+
+describe("getPublicHotelDisplayOffers", () => {
+  it("returns only active offers for the requested placement and resolved hotel", async () => {
+    vi.stubEnv("NODE_ENV", "development");
+    vi.stubEnv("VITE_SUPABASE_URL", "https://example.supabase.co");
+    vi.stubEnv("VITE_SUPABASE_ANON_KEY", "anon-key");
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "service-role-key");
+    vi.stubEnv("BUILDER_PREVIEW_TENANT_ORGANIZATION_ID", organizationId);
+    const fetchMock = vi.fn(async (input: string | URL | Request) => {
+      const url = String(input);
+      if (url.includes("hotel_tenant_settings?")) return new Response(JSON.stringify([{
+        organization_id: organizationId,
+        display_name: "MisuriStay",
+        logo_url: null,
+        primary_color: null,
+        accent_color: null,
+      }]), { status: 200 });
+      if (url.includes("hotel_display_offers?")) return new Response(JSON.stringify([{
+        title: "Lunch Special",
+        description: "Buy one, get one free on signature dishes",
+        badge_text: "Until 3 PM",
+        icon_key: "Utensils",
+        icon_color: "green",
+        display_order: 1,
+      }]), { status: 200 });
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = { statusCode: 200, body: null as unknown };
+    const response = {
+      setHeader: vi.fn(),
+      status(code: number) { result.statusCode = code; return this; },
+      json(body: unknown) { result.body = body; return this; },
+    };
+    await getPublicHotelDisplayOffers({
+      hostname: request.hostname,
+      query: { placement: "home_carousel" },
+    } as unknown as Parameters<typeof getPublicHotelDisplayOffers>[0], response as unknown as Parameters<typeof getPublicHotelDisplayOffers>[1], (() => undefined) as Parameters<typeof getPublicHotelDisplayOffers>[2]);
+
+    expect(result.statusCode).toBe(200);
+    expect(result.body).toMatchObject({ offers: [{ title: "Lunch Special", badge_text: "Until 3 PM" }] });
+    expect(fetchMock.mock.calls.some(([input]) => String(input).includes(`organization_id=eq.${organizationId}&placement=eq.home_carousel&is_active=eq.true`))).toBe(true);
+    expect(response.setHeader).toHaveBeenCalledWith("Cache-Control", "private, no-store");
+  });
+});
+
+describe("getHotelDisplayOffersForManagement", () => {
+  it("allows a manager to load only their hotel's display offers", async () => {
+    vi.stubEnv("NODE_ENV", "development");
+    vi.stubEnv("VITE_SUPABASE_URL", "https://example.supabase.co");
+    vi.stubEnv("VITE_SUPABASE_ANON_KEY", "anon-key");
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "service-role-key");
+    vi.stubEnv("BUILDER_PREVIEW_TENANT_ORGANIZATION_ID", organizationId);
+    const userId = "bd15af7a-93a0-4618-bd1f-4dc72c7f88c6";
+    const fetchMock = vi.fn(async (input: string | URL | Request) => {
+      const url = String(input);
+      if (url.endsWith("/auth/v1/user")) return new Response(JSON.stringify({ id: userId }), { status: 200 });
+      if (url.includes("hotel_tenant_settings?")) return new Response(JSON.stringify([{
+        organization_id: organizationId,
+        display_name: "MisuriStay",
+        logo_url: null,
+        primary_color: null,
+        accent_color: null,
+      }]), { status: 200 });
+      if (url.includes("user_profiles?")) return new Response(JSON.stringify([{ role: "manager" }]), { status: 200 });
+      if (url.includes("books_memberships?")) return new Response(JSON.stringify([{ role: "manager" }]), { status: 200 });
+      if (url.includes("hotel_display_offers?")) return new Response(JSON.stringify([{ id: "home-offer", title: "Welcome Special" }]), { status: 200 });
+      throw new Error(`Unexpected request: ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = { statusCode: 200, body: null as unknown };
+    const response = {
+      setHeader: vi.fn(),
+      status(code: number) { result.statusCode = code; return this; },
+      json(body: unknown) { result.body = body; return this; },
+    };
+    await getHotelDisplayOffersForManagement({
+      hostname: request.hostname,
+      headers: { authorization: "Bearer user-token" },
+    } as Parameters<typeof getHotelDisplayOffersForManagement>[0], response as unknown as Parameters<typeof getHotelDisplayOffersForManagement>[1], (() => undefined) as Parameters<typeof getHotelDisplayOffersForManagement>[2]);
+
+    expect(result.statusCode).toBe(200);
+    expect(result.body).toEqual({ offers: [{ id: "home-offer", title: "Welcome Special" }] });
+    expect(fetchMock.mock.calls.some(([input]) => String(input).includes(`organization_id=eq.${organizationId}&select=id,organization_id`))).toBe(true);
   });
 });
 

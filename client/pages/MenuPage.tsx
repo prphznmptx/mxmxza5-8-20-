@@ -55,33 +55,52 @@ import {
 } from "lucide-react";
 
 const MenuSpecialOffer = () => {
+  const { tenant } = useHotelTenant();
   const [currentTime, setCurrentTime] = useState(() => new Date());
+  const [offers, setOffers] = useState<Array<{
+    title: string;
+    description: string;
+    emoji: string;
+    daily_start_time: string;
+    daily_end_time: string;
+  }>>([]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60_000);
     return () => clearInterval(timer);
   }, []);
 
-  const hour = currentTime.getHours();
-  const offer = hour >= 11 && hour < 15
-    ? {
-        title: "Lunch Special",
-        description: "Order now and skip the queue - you come first!",
-        emoji: "🍽️",
-        endsAt: new Date(currentTime.getTime() + (15 - hour) * 60 * 60 * 1000 - currentTime.getMinutes() * 60 * 1000),
-      }
-    : hour >= 17 && hour < 23
-      ? {
-          title: "Evening Delight",
-          description: "Live jazz band + special cocktail prices",
-          emoji: "🎷",
-          endsAt: new Date(currentTime.getTime() + (23 - hour) * 60 * 60 * 1000 - currentTime.getMinutes() * 60 * 1000),
-        }
-      : null;
+  useEffect(() => {
+    let active = true;
+    setOffers([]);
+    if (!tenant) return () => { active = false; };
+
+    fetch("/api/hotel-display-offers?placement=menu_banner", { cache: "no-store" })
+      .then(async (response) => {
+        const payload = await response.json().catch(() => null) as { offers?: typeof offers } | null;
+        if (!response.ok) throw new Error("Menu offers could not be loaded.");
+        if (active) setOffers(payload?.offers || []);
+      })
+      .catch((error) => console.error("Unable to load hotel menu offers", error));
+
+    return () => { active = false; };
+  }, [tenant?.organizationId]);
+
+  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+  const offer = offers.find((candidate) => {
+    const [startHour, startMinute] = candidate.daily_start_time.split(":").map(Number);
+    const [endHour, endMinute] = candidate.daily_end_time.split(":").map(Number);
+    const startMinutes = startHour * 60 + startMinute;
+    const endMinutes = endHour * 60 + endMinute;
+    return currentMinutes >= startMinutes && currentMinutes < endMinutes;
+  });
 
   if (!offer) return null;
 
-  const remainingTime = offer.endsAt.getTime() - currentTime.getTime();
+  const [endHour, endMinute] = offer.daily_end_time.split(":").map(Number);
+  const endsAt = new Date(currentTime);
+  endsAt.setHours(endHour, endMinute, 0, 0);
+  const remainingTime = endsAt.getTime() - currentTime.getTime();
 
   return (
     <Card className="mb-8 border-sheraton-gold bg-gradient-to-r from-sheraton-gold/10 to-sheraton-gold/5">
