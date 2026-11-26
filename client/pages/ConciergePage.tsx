@@ -3,6 +3,7 @@ import {
   Crown,
   MessageSquare,
   Phone,
+  Mail,
   MapPin,
   Calendar,
   Car,
@@ -784,6 +785,24 @@ const ConciergePage: React.FC = () => {
               <div>
                 <p className="font-medium text-sheraton-navy">Response Time</p>
                 <p className="text-sm text-gray-600">Under 15 minutes</p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="rounded-md bg-white/70 p-4 text-left">
+              <h2 className="mb-3 font-semibold text-sheraton-navy">Guest Contact</h2>
+              <div className="space-y-2 text-sm text-gray-700">
+                <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-sheraton-gold" /> +1 (555) SPECIAL</p>
+                <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-sheraton-gold" /> special@sheraton.com</p>
+                <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-sheraton-gold" /> Luxury District, Premium City</p>
+              </div>
+            </div>
+            <div className="rounded-md bg-white/70 p-4 text-left">
+              <h2 className="mb-3 font-semibold text-sheraton-navy">Operations Support</h2>
+              <div className="space-y-2 text-sm text-gray-700">
+                <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-sheraton-gold" /> +1 (555) OPERATIONS</p>
+                <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-sheraton-gold" /> support@serviceplatform.com</p>
+                <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-sheraton-gold" /> Operations Center, Management City</p>
               </div>
             </div>
           </div>
