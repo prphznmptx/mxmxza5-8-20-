@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Link, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import Header from "./components/layout/Header";
-import Footer from "./components/layout/Footer";
+import Footer, { CompactFooter } from "./components/layout/Footer";
 import ServicesFooter from "./components/layout/ServicesFooter";
 import ServicesHomePage from "./pages/ServicesHomePage";
 import HomePage from "./pages/HomePage";
 import { supabase, useSupabaseAuth } from "./lib/supabase";
 import { RewardsPointsProvider } from "./lib/rewardsPointsContext";
-import { useHotelTenant } from "./lib/hotelTenant";
-import { Mail, MapPin, Phone } from "lucide-react";
 import {
   cacheHomeIdentity,
   getCachedHomeIdentity,
@@ -130,64 +128,6 @@ function RoleAwareHomePage() {
   return <><ServicesHomePage role={role === "manager" ? "manager" : "worker"} displayName={displayName} /><ServicesFooter /></>;
 }
 
-function CompactFooter({ audience }: { audience: "guest" | "staff" }) {
-  const { tenant } = useHotelTenant();
-  const isGuest = audience === "guest";
-  const contactDetails = isGuest
-    ? [
-        { icon: Phone, text: "+1 (555) SPECIAL" },
-        { icon: Mail, text: "special@sheraton.com" },
-        { icon: MapPin, text: "Luxury District, Premium City" },
-      ]
-    : [
-        { icon: Phone, text: "+1 (555) OPERATIONS" },
-        { icon: Mail, text: "support@serviceplatform.com" },
-        { icon: MapPin, text: "Operations Center, Management City" },
-      ];
-  const links = isGuest
-    ? [
-        { label: "Account Settings", to: "/profile" },
-        { label: "Help Center", to: "/concierge" },
-        { label: "Share Your Experience", to: "/reviews" },
-      ]
-    : [
-        { label: "Account Settings", to: "/profile" },
-        { label: "Help Center", to: "/concierge" },
-        { label: "Share Your Experience", to: "/reviews" },
-      ];
-
-  return (
-    <footer className="bg-sheraton-navy text-white">
-      <div className="container space-y-4 py-6">
-        <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-col gap-2 text-sm text-gray-200">
-            {contactDetails.map(({ icon: Icon, text }) => (
-              <span key={text} className="flex items-center gap-2">
-                <Icon className="h-4 w-4 shrink-0 text-sheraton-gold" />
-                {text}
-              </span>
-            ))}
-          </div>
-          <nav aria-label={isGuest ? "Guest links" : "Staff support links"} className="flex flex-col gap-2 text-sm">
-            {links.map(({ label, to }) => (
-              <Link key={label} to={to} className="text-gray-200 transition-colors hover:text-sheraton-gold">
-                {label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-        <div className="flex flex-col gap-2 border-t border-white/15 pt-3 text-xs text-gray-300 sm:flex-row sm:items-center sm:justify-between">
-          <span>© {new Date().getFullYear()} {tenant?.name || (isGuest ? "IvyTowers" : "Service Platform")}. All rights reserved.</span>
-          <nav aria-label="Legal links" className="flex gap-4">
-            <Link to="/privacy" className="hover:text-white">Privacy</Link>
-            <Link to="/terms" className="hover:text-white">Terms</Link>
-          </nav>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
 function RouteAwareFooter() {
   const { pathname } = useLocation();
   const guestFooterPaths = [
@@ -206,7 +146,6 @@ function RouteAwareFooter() {
     "/staff",
     "/management",
     "/platform/hotels",
-    "/profile",
     "/tasks",
     "/reports",
     "/accounts",
