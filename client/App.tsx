@@ -153,6 +153,7 @@ function CompactFooter({ audience }: { audience: "guest" | "staff" }) {
     : [
         { label: "Account Settings", to: "/profile" },
         { label: "Help Center", to: "/concierge" },
+        { label: "Share Your Experience", to: "/reviews" },
       ];
 
   return (
