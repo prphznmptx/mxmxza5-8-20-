@@ -9,6 +9,7 @@ import { supabase } from "../lib/supabase";
 import { clearPendingCheckout, type ResumableMenuOrder } from "../lib/flutterwave";
 import { loadActiveMenuCart, syncActiveMenuCart } from "../lib/menuCart";
 import { useHotelTenant } from "../lib/hotelTenant";
+import { useHotelDisplayOffers } from "../hooks/useHotelDisplayOffers";
 import {
   Card,
   CardContent,
@@ -55,39 +56,17 @@ import {
 } from "lucide-react";
 
 const MenuSpecialOffer = () => {
-  const { tenant } = useHotelTenant();
+  const offers = useHotelDisplayOffers("menu_banner");
   const [currentTime, setCurrentTime] = useState(() => new Date());
-  const [offers, setOffers] = useState<Array<{
-    title: string;
-    description: string;
-    emoji: string;
-    daily_start_time: string;
-    daily_end_time: string;
-  }>>([]);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60_000);
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    let active = true;
-    setOffers([]);
-    if (!tenant) return () => { active = false; };
-
-    fetch("/api/hotel-display-offers?placement=menu_banner", { cache: "no-store" })
-      .then(async (response) => {
-        const payload = await response.json().catch(() => null) as { offers?: typeof offers } | null;
-        if (!response.ok) throw new Error("Menu offers could not be loaded.");
-        if (active) setOffers(payload?.offers || []);
-      })
-      .catch((error) => console.error("Unable to load hotel menu offers", error));
-
-    return () => { active = false; };
-  }, [tenant?.organizationId]);
-
   const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
   const offer = offers.find((candidate) => {
+    if (!candidate.daily_start_time || !candidate.daily_end_time) return false;
     const [startHour, startMinute] = candidate.daily_start_time.split(":").map(Number);
     const [endHour, endMinute] = candidate.daily_end_time.split(":").map(Number);
     const startMinutes = startHour * 60 + startMinute;
@@ -97,7 +76,7 @@ const MenuSpecialOffer = () => {
 
   if (!offer) return null;
 
-  const [endHour, endMinute] = offer.daily_end_time.split(":").map(Number);
+  const [endHour, endMinute] = (offer.daily_end_time || "00:00").split(":").map(Number);
   const endsAt = new Date(currentTime);
   endsAt.setHours(endHour, endMinute, 0, 0);
   const remainingTime = endsAt.getTime() - currentTime.getTime();
@@ -107,7 +86,7 @@ const MenuSpecialOffer = () => {
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="text-4xl">{offer.emoji}</div>
+            <div className="text-4xl">{offer.emoji || ""}</div>
             <div>
               <h3 className="text-xl font-bold text-sheraton-navy">{offer.title}</h3>
               <p className="text-muted-foreground">{offer.description}</p>

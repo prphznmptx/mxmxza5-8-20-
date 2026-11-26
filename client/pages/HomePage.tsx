@@ -10,6 +10,7 @@ import {
 import { Badge } from "../components/ui/badge";
 import GuestComplaintForm from "../components/GuestComplaintForm";
 import { useHotelTenant } from "../lib/hotelTenant";
+import { useHotelDisplayOffers } from "../hooks/useHotelDisplayOffers";
 import {
   Crown,
   Hotel,
@@ -49,33 +50,11 @@ const HomePage = ({ displayName = "Special Guest" }: HomePageProps) => {
     else setTimeOfDay("evening");
   }, []);
 
-  const [specialOffers, setSpecialOffers] = useState<Array<{
-    title: string;
-    description: string;
-    badge_text: string;
-    icon_key: "Crown" | "Utensils" | "Coffee";
-    icon_color: "gold" | "green" | "purple";
-  }>>([]);
+  const specialOffers = useHotelDisplayOffers("home_carousel");
 
   useEffect(() => {
-    let active = true;
-    setSpecialOffers([]);
     setCurrentOffer(0);
-    if (!tenant) return () => { active = false; };
-
-    fetch("/api/hotel-display-offers?placement=home_carousel", { cache: "no-store" })
-      .then(async (response) => {
-        const payload = await response.json().catch(() => null) as { offers?: typeof specialOffers } | null;
-        if (!response.ok) throw new Error("Home offers could not be loaded.");
-        if (active) {
-          setCurrentOffer(0);
-          setSpecialOffers(payload?.offers || []);
-        }
-      })
-      .catch((error) => console.error("Unable to load hotel home offers", error));
-
-    return () => { active = false; };
-  }, [tenant?.organizationId]);
+  }, [tenant?.organizationId, specialOffers.length]);
 
   const offerIcons = { Crown, Utensils, Coffee };
   const offerColors = {
@@ -164,7 +143,7 @@ const HomePage = ({ displayName = "Special Guest" }: HomePageProps) => {
   }, [specialOffers.length]);
 
   const activeOffer = specialOffers[currentOffer];
-  const CurrentOfferIcon = activeOffer ? offerIcons[activeOffer.icon_key] : null;
+  const CurrentOfferIcon = activeOffer?.icon_key ? offerIcons[activeOffer.icon_key] : null;
 
   return (
     <div className="min-h-screen">
@@ -219,11 +198,11 @@ const HomePage = ({ displayName = "Special Guest" }: HomePageProps) => {
               <div className="glass-effect rounded-2xl p-6 max-w-md mx-auto">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <CurrentOfferIcon className={`h-5 w-5 ${offerColors[activeOffer.icon_color]}`} />
+                    <CurrentOfferIcon className={`h-5 w-5 ${offerColors[activeOffer.icon_color || "gold"]}`} />
                     <span className="font-semibold">{activeOffer.title}</span>
                   </div>
                   <Badge variant="secondary" className="bg-white/20 text-white">
-                    {activeOffer.badge_text}
+                    {activeOffer.badge_text || ""}
                   </Badge>
                 </div>
                 <p className="text-sm text-white/80">{activeOffer.description}</p>
