@@ -16,9 +16,6 @@ import {
   Heart,
 } from "lucide-react";
 
-// DISABLED (2025-05-11): Original guest-focused Footer
-// Kept intact for future restoration. See DISABLED_FEATURES.md
-// Use ProviderFooter instead.
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
@@ -242,6 +239,4 @@ const Footer = () => {
   );
 };
 
-// Component kept but not exported - use ProviderFooter instead
-// Uncomment below to restore guest-focused footer
-// export default Footer;
+export default Footer;

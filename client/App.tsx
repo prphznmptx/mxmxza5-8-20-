@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
 import ServicesFooter from "./components/layout/ServicesFooter";
 import ServicesHomePage from "./pages/ServicesHomePage";
 import HomePage from "./pages/HomePage";
@@ -121,15 +122,27 @@ function RoleAwareHomePage() {
   }
 
   if (role === "guest") {
-    return <HomePage displayName={displayName} />;
+    return <><HomePage displayName={displayName} /><Footer /></>;
   }
 
-  return <ServicesHomePage role={role === "manager" ? "manager" : "worker"} displayName={displayName} />;
+  return <><ServicesHomePage role={role === "manager" ? "manager" : "worker"} displayName={displayName} /><ServicesFooter /></>;
 }
 
-function RouteAwareServicesFooter() {
+function RouteAwareFooter() {
   const { pathname } = useLocation();
-  const footerPaths = [
+  const guestFooterPaths = [
+    "/menu",
+    "/travel",
+    "/events",
+    "/blog",
+    "/shop",
+    "/reviews",
+    "/concierge",
+    "/offers",
+    "/spa",
+    "/fitness",
+  ];
+  const serviceFooterPaths = [
     "/staff",
     "/management",
     "/platform/hotels",
@@ -143,10 +156,12 @@ function RouteAwareServicesFooter() {
     "/offers/manage",
     "/spa/manage",
   ];
-  const shouldShowFooter = footerPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`))
-    || pathname.startsWith("/events/operations/");
+  const matchesPath = (paths: string[]) => paths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 
-  return shouldShowFooter ? <ServicesFooter /> : null;
+  if (pathname.startsWith("/events/operations/")) return <ServicesFooter />;
+  if (matchesPath(serviceFooterPaths)) return <ServicesFooter />;
+  if (matchesPath(guestFooterPaths)) return <Footer />;
+  return null;
 }
 
 function App() {
@@ -208,7 +223,7 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
-          <RouteAwareServicesFooter />
+          <RouteAwareFooter />
           <Toaster />
             <ToastRenderer />
           </div>
