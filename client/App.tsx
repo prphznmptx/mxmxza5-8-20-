@@ -155,7 +155,7 @@ function CompactFooter({ audience }: { audience: "guest" | "staff" }) {
     <footer className="bg-sheraton-navy text-white">
       <div className="container space-y-4 py-6">
         <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-col gap-2 text-sm text-gray-200 sm:flex-row sm:flex-wrap sm:gap-x-6">
+          <div className="flex flex-col gap-2 text-sm text-gray-200">
             {contactDetails.map(({ icon: Icon, text }) => (
               <span key={text} className="flex items-center gap-2">
                 <Icon className="h-4 w-4 shrink-0 text-sheraton-gold" />
@@ -163,7 +163,7 @@ function CompactFooter({ audience }: { audience: "guest" | "staff" }) {
               </span>
             ))}
           </div>
-          <nav aria-label={isGuest ? "Guest links" : "Staff support links"} className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+          <nav aria-label={isGuest ? "Guest links" : "Staff support links"} className="flex flex-col gap-2 text-sm">
             {links.map(({ label, to }) => (
               <Link key={label} to={to} className="text-gray-200 transition-colors hover:text-sheraton-gold">
                 {label}
