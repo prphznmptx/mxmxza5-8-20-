@@ -58,7 +58,7 @@ const ForgotPasswordPage: React.FC = () => {
   };
 
   return (
-    <div className="flex h-[calc(100dvh-4rem)] min-h-0 flex-col items-center overflow-y-auto bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 px-4 py-[clamp(0.5rem,2dvh,1rem)] sm:px-6 lg:px-8">
+    <div className="flex h-[calc(100dvh-4rem)] min-h-0 flex-col items-center overflow-y-auto bg-gradient-to-br from-sheraton-cream to-background px-4 py-[clamp(0.5rem,2dvh,1rem)] sm:px-6 lg:px-8">
       <div className="mx-auto my-auto w-full max-w-md rounded-lg bg-card p-[clamp(1rem,4dvh,2rem)] text-card-foreground shadow-lg">
         {/* Header */}
         <div className="text-center mb-[clamp(1rem,4dvh,2rem)]">
