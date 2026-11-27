@@ -94,14 +94,14 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="flex h-[calc(100dvh-4rem)] min-h-0 flex-col items-center overflow-y-auto bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-4 sm:px-6 lg:px-8">
-      <div className="mx-auto my-auto w-full max-w-md bg-white rounded-lg shadow-lg p-8">
+    <div className="flex h-[calc(100dvh-4rem)] min-h-0 flex-col items-center overflow-y-auto bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-[clamp(0.5rem,2dvh,1rem)] sm:px-6 lg:px-8">
+      <div className="mx-auto my-auto w-full max-w-md bg-white rounded-lg shadow-lg p-[clamp(1rem,4dvh,2rem)]">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
+        <div className="text-center mb-[clamp(1rem,4dvh,2rem)]">
+          <div className="flex items-center justify-center mb-[clamp(0.5rem,2dvh,1rem)]">
             <Crown className="w-8 h-8 text-sheraton-gold" />
           </div>
-          <h1 className="text-3xl font-bold text-sheraton-navy mb-2">
+          <h1 className="text-[clamp(1.5rem,4dvh,1.875rem)] font-bold text-sheraton-navy mb-[clamp(0.25rem,1dvh,0.5rem)]">
             Welcome Back
           </h1>
           <p className="text-gray-600">Sign in to your Sheraton account</p>
@@ -115,10 +115,10 @@ const LoginPage: React.FC = () => {
         )}
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-[clamp(1rem,3dvh,1.5rem)]">
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-2">
+            <label htmlFor="email" className="block text-sm font-medium mb-[clamp(0.25rem,1dvh,0.5rem)]">
               Email Address
             </label>
             <div className="relative">
@@ -142,7 +142,7 @@ const LoginPage: React.FC = () => {
 
           {/* Password */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-2">
+            <label htmlFor="password" className="block text-sm font-medium mb-[clamp(0.25rem,1dvh,0.5rem)]">
               Password
             </label>
             <div className="relative">
@@ -206,7 +206,7 @@ const LoginPage: React.FC = () => {
         </form>
 
         {/* Sign Up Link */}
-        <div className="mt-6 text-center">
+        <div className="mt-[clamp(0.75rem,3dvh,1.5rem)] text-center">
           <p className="text-gray-600">
             Don't have an account?{" "}
             <Link
