@@ -53,6 +53,7 @@ export function CompactFooter({ audience }: { audience: "guest" | "staff" }) {
 }
 
 const Footer = () => {
+  const { tenant } = useHotelTenant();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -253,7 +254,7 @@ const Footer = () => {
                 Terms of Service
               </Link>
               <span>
-                © {currentYear} Sheraton Special. All rights reserved.
+                © {currentYear} {tenant?.name || "IvyTowers"}. All rights reserved.
               </span>
             </div>
           </div>
