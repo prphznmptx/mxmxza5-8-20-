@@ -15,23 +15,27 @@ import {
   Award,
   Shield,
   Heart,
+  Settings,
+  CircleHelp,
+  MessageSquare,
 } from "lucide-react";
 
 export function CompactFooter({ audience }: { audience: "guest" | "staff" }) {
   const { tenant } = useHotelTenant();
   const isGuest = audience === "guest";
   const links = [
-    { label: "Account Settings", to: "/profile" },
-    { label: "Help Center", to: "/concierge" },
-    { label: "Share Your Experience", to: "/reviews" },
+    { label: "Settings", to: "/profile", icon: Settings },
+    { label: "Help Center", to: "/concierge", icon: CircleHelp },
+    { label: "Feedback", to: "/reviews", icon: MessageSquare },
   ];
 
   return (
     <footer className="bg-sheraton-navy text-white">
       <div className="container space-y-4 py-6">
-        <nav aria-label={isGuest ? "Guest links" : "Staff support links"} className="grid w-full grid-cols-3 items-center gap-3 text-center text-sm">
-          {links.map(({ label, to }) => (
-            <Link key={label} to={to} className="text-gray-200 transition-colors hover:text-sheraton-gold">
+        <nav aria-label={isGuest ? "Guest links" : "Staff support links"} className="flex w-full flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm md:pr-4">
+          {links.map(({ label, to, icon: Icon }) => (
+            <Link key={label} to={to} className="flex items-center gap-1.5 text-gray-200 transition-colors hover:text-sheraton-gold">
+              <Icon className="h-4 w-4" />
               {label}
             </Link>
           ))}
