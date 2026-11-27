@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Fragment } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Crown,
@@ -1028,46 +1029,57 @@ const RegisterPage: React.FC = () => {
   );
 
   const renderStepIndicator = () => (
-    <div className="mb-8 grid grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-3 md:grid-cols-5">
-      {[
-        { id: "role", label: "Account Type", icon: Shield },
-        { id: "info", label: "Account Info", icon: User },
-        { id: "preferences", label: "Preferences", icon: Settings },
-        { id: "verification", label: "Verification", icon: Shield },
-        { id: "complete", label: "Complete", icon: CheckCircle },
-      ].map((stepItem, index) => {
-        const isActive = step === stepItem.id;
-        const isCompleted =
-          (step === "info" && stepItem.id === "role") ||
-          (step === "preferences" && ["role", "info"].includes(stepItem.id)) ||
-          (step === "verification" &&
-            ["role", "info", "preferences"].includes(stepItem.id)) ||
-          (step === "complete" &&
-            ["role", "info", "preferences", "verification"].includes(stepItem.id));
+    <div className="mb-8">
+      <div className="flex min-w-[620px] items-center justify-between gap-1">
+        {[
+          { id: "role", label: "Account Type", icon: Shield },
+          { id: "info", label: "Account Info", icon: User },
+          { id: "preferences", label: "Preferences", icon: Settings },
+          { id: "verification", label: "Verification", icon: Shield },
+          { id: "complete", label: "Complete", icon: CheckCircle },
+        ].map((stepItem, index) => {
+          const isActive = step === stepItem.id;
+          const isCompleted =
+            (step === "info" && stepItem.id === "role") ||
+            (step === "preferences" && ["role", "info"].includes(stepItem.id)) ||
+            (step === "verification" &&
+              ["role", "info", "preferences"].includes(stepItem.id)) ||
+            (step === "complete" &&
+              ["role", "info", "preferences", "verification"].includes(stepItem.id));
 
-        return (
-          <div key={stepItem.id} className="flex min-w-0 flex-col items-center gap-2 text-center">
-            <div
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-                isCompleted
-                  ? "bg-green-500 text-white"
-                  : isActive
-                    ? "bg-sheraton-gold text-sheraton-navy"
-                    : "bg-muted text-muted-foreground"
-              }`}
-            >
-              <stepItem.icon className="h-5 w-5" />
-            </div>
-            <span
-              className={`text-xs font-medium leading-tight sm:text-sm ${
-                isActive ? "text-foreground" : "text-muted-foreground"
-              }`}
-            >
-              {stepItem.label}
-            </span>
-          </div>
-        );
-      })}
+          return (
+            <Fragment key={stepItem.id}>
+              <div className="flex shrink-0 items-center gap-1">
+                <div
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
+                    isCompleted
+                      ? "bg-green-500 text-white"
+                      : isActive
+                        ? "bg-sheraton-gold text-sheraton-navy"
+                        : "bg-muted text-muted-foreground"
+                  }`}
+                >
+                  <stepItem.icon className="h-5 w-5" />
+                </div>
+                <span
+                  className={`whitespace-nowrap text-xs font-medium ${
+                    isActive ? "text-foreground" : "text-muted-foreground"
+                  }`}
+                >
+                  {stepItem.label}
+                </span>
+              </div>
+              {index < 4 && (
+                <div
+                  className={`h-0.5 min-w-3 flex-1 ${
+                    isCompleted ? "bg-green-500" : "bg-border"
+                  }`}
+                />
+              )}
+            </Fragment>
+          );
+        })}
+      </div>
     </div>
   );
 
