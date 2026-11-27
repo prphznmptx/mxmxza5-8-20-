@@ -94,7 +94,7 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="flex h-[calc(100dvh-4rem)] min-h-0 flex-col items-center overflow-y-auto bg-gradient-to-br from-sheraton-cream to-background px-4 py-[clamp(0.5rem,2dvh,1rem)] sm:px-6 lg:px-8">
+    <div className="flex h-[calc(100dvh-4rem)] min-h-0 flex-col items-center overflow-y-auto bg-sheraton-cream px-4 py-[clamp(0.5rem,2dvh,1rem)] sm:px-6 lg:px-8">
       <div className="mx-auto my-auto w-full max-w-md rounded-lg bg-card text-card-foreground shadow-lg p-[clamp(1rem,4dvh,2rem)]">
         {/* Header */}
         <div className="text-center mb-[clamp(1rem,4dvh,2rem)]">
