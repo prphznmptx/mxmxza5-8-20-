@@ -163,69 +163,72 @@ function RouteAwareFooter() {
   return null;
 }
 
+function AppShell() {
+  const isLoginPage = useLocation().pathname === "/login";
+
+  return (
+    <div className={`bg-background flex flex-col ${isLoginPage ? "h-[100dvh] overflow-hidden" : "min-h-screen"}`}>
+      <Header />
+      <main className={isLoginPage ? "min-h-0 flex-1 overflow-hidden" : "flex-1"}>
+        <Routes>
+          <Route path="/" element={<RoleAwareHomePage />} />
+          <Route path="/book" element={<BookingPage />} />
+          <Route path="/menu" element={<MenuPage />} />
+          <Route path="/checkout/flutterwave-return" element={<FlutterwaveReturnPage />} />
+          <Route path="/staff/menu" element={<MenuManagementPage />} />
+          <Route path="/profile" element={<ServicesProfilePage />} />
+          <Route path="/staff" element={<StaffPortalPage />} />
+          <Route path="/management" element={<ManagementPage />} />
+          <Route path="/platform/hotels" element={<PlatformHotelsPage />} />
+          <Route path="/travel" element={<TravelDeskPage />} />
+          <Route path="/events/operations/:eventId" element={<SpecialEventOperationsPage />} />
+          <Route path="/events" element={<EventsPage />} />
+          <Route path="/workers" element={<WorkersPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/tasks/*" element={<TasksPage />} />
+          <Route path="/tasks/new" element={<TasksPage />} />
+          <Route path="/tasks/list" element={<TasksPage />} />
+          <Route path="/tasks/chat" element={<TasksPage />} />
+          <Route path="/reports/*" element={<ReportsPage />} />
+          <Route path="/reports/tasks" element={<ReportsPage />} />
+          <Route path="/reports/performance" element={<ReportsPage />} />
+          <Route path="/reports/vendors" element={<ReportsPage />} />
+          <Route path="/books" element={<BooksPage />} />
+          <Route path="/accounts/*" element={<AccountsPage />} />
+          <Route path="/accounts/vendors" element={<AccountsPage />} />
+          <Route path="/accounts/quotes" element={<AccountsPage />} />
+          <Route path="/accounts/billing" element={<AccountsPage />} />
+          <Route path="/billing/plans" element={<BillingPlansPage />} />
+          <Route path="/billing/payment-methods" element={<PaymentMethodPage />} />
+          <Route path="/billing/payout-methods" element={<PayoutMethodPage />} />
+          <Route path="/reviews" element={<ReviewsPage />} />
+          <Route path="/concierge" element={<ConciergePage />} />
+          <Route path="/offers" element={<HotelOffersPage />} />
+          <Route path="/offers/manage" element={<HotelOffersManagementPage />} />
+          <Route path="/offers-dev" element={<OffersPage />} />
+          <Route path="/spa" element={<HotelSpaPage />} />
+          <Route path="/spa/manage" element={<HotelSpaManagementPage />} />
+          <Route path="/fitness" element={<PlaceholderPage section="Fitness Center" />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+      <RouteAwareFooter />
+      <Toaster />
+      <ToastRenderer />
+    </div>
+  );
+}
+
 function App() {
   return (
     <RewardsPointsProvider>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <BrowserRouter>
-          <div className="min-h-screen bg-background flex flex-col">
-          <Header />
-          <main className="flex-1">
-            <Routes>
-              <Route path="/" element={<RoleAwareHomePage />} />
-              <Route path="/book" element={<BookingPage />} />
-              <Route path="/menu" element={<MenuPage />} />
-              <Route path="/checkout/flutterwave-return" element={<FlutterwaveReturnPage />} />
-              <Route path="/staff/menu" element={<MenuManagementPage />} />
-              <Route path="/profile" element={<ServicesProfilePage />} />
-              <Route path="/staff" element={<StaffPortalPage />} />
-              <Route path="/management" element={<ManagementPage />} />
-              <Route path="/platform/hotels" element={<PlatformHotelsPage />} />
-              <Route path="/travel" element={<TravelDeskPage />} />
-              <Route path="/events/operations/:eventId" element={<SpecialEventOperationsPage />} />
-              <Route path="/events" element={<EventsPage />} />
-              <Route path="/workers" element={<WorkersPage />} />
-              <Route path="/blog" element={<BlogPage />} />
-              <Route path="/shop" element={<ShopPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/tasks/*" element={<TasksPage />} />
-              <Route path="/tasks/new" element={<TasksPage />} />
-              <Route path="/tasks/list" element={<TasksPage />} />
-              <Route path="/tasks/chat" element={<TasksPage />} />
-              <Route path="/reports/*" element={<ReportsPage />} />
-              <Route path="/reports/tasks" element={<ReportsPage />} />
-              <Route path="/reports/performance" element={<ReportsPage />} />
-              <Route path="/reports/vendors" element={<ReportsPage />} />
-              <Route path="/books" element={<BooksPage />} />
-              <Route path="/accounts/*" element={<AccountsPage />} />
-              <Route path="/accounts/vendors" element={<AccountsPage />} />
-              <Route path="/accounts/quotes" element={<AccountsPage />} />
-              <Route path="/accounts/billing" element={<AccountsPage />} />
-              <Route path="/billing/plans" element={<BillingPlansPage />} />
-              <Route path="/billing/payment-methods" element={<PaymentMethodPage />} />
-              <Route path="/billing/payout-methods" element={<PayoutMethodPage />} />
-              <Route path="/reviews" element={<ReviewsPage />} />
-              <Route path="/concierge" element={<ConciergePage />} />
-              <Route path="/offers" element={<HotelOffersPage />} />
-              <Route path="/offers/manage" element={<HotelOffersManagementPage />} />
-              <Route path="/offers-dev" element={<OffersPage />} />
-              <Route path="/spa" element={<HotelSpaPage />} />
-              <Route path="/spa/manage" element={<HotelSpaManagementPage />} />
-              <Route
-                path="/fitness"
-                element={<PlaceholderPage section="Fitness Center" />}
-              />
-              <Route path="/concierge" element={<ConciergePage />} />
-              <Route path="/reviews" element={<ReviewsPage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-          <RouteAwareFooter />
-          <Toaster />
-            <ToastRenderer />
-          </div>
+          <AppShell />
         </BrowserRouter>
       </ThemeProvider>
     </RewardsPointsProvider>
