@@ -94,8 +94,8 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
+    <div className="flex min-h-[calc(100dvh-4rem)] items-center justify-center overflow-y-auto bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-md mx-auto overflow-hidden bg-white rounded-lg shadow-lg p-8">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
