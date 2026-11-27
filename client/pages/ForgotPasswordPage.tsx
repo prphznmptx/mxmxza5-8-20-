@@ -58,14 +58,14 @@ const ForgotPasswordPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
+    <div className="flex h-[calc(100dvh-4rem)] min-h-0 flex-col items-center overflow-y-auto bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-[clamp(0.5rem,2dvh,1rem)] sm:px-6 lg:px-8">
+      <div className="mx-auto my-auto w-full max-w-md rounded-lg bg-white p-[clamp(1rem,4dvh,2rem)] shadow-lg">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
+        <div className="text-center mb-[clamp(1rem,4dvh,2rem)]">
+          <div className="flex items-center justify-center mb-[clamp(0.5rem,2dvh,1rem)]">
             <Crown className="w-8 h-8 text-sheraton-gold" />
           </div>
-          <h1 className="text-3xl font-bold text-sheraton-navy mb-2">
+          <h1 className="text-[clamp(1.5rem,4dvh,1.875rem)] font-bold text-sheraton-navy mb-[clamp(0.25rem,1dvh,0.5rem)]">
             Reset Password
           </h1>
           <p className="text-gray-600">
@@ -85,10 +85,10 @@ const ForgotPasswordPage: React.FC = () => {
             )}
 
             {/* Reset Form */}
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-[clamp(1rem,3dvh,1.5rem)]">
               {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-sm font-medium mb-2">
+                <label htmlFor="email" className="block text-sm font-medium mb-[clamp(0.25rem,1dvh,0.5rem)]">
                   Email Address
                 </label>
                 <div className="relative">
@@ -118,7 +118,7 @@ const ForgotPasswordPage: React.FC = () => {
             </form>
 
             {/* Back to Login Link */}
-            <div className="mt-6">
+            <div className="mt-[clamp(0.75rem,3dvh,1.5rem)]">
               <Link
                 to="/login"
                 className="flex items-center justify-center text-sheraton-navy hover:text-sheraton-gold transition"
@@ -131,12 +131,12 @@ const ForgotPasswordPage: React.FC = () => {
         ) : (
           <>
             {/* Success Message */}
-            <div className="text-center space-y-6">
+            <div className="text-center space-y-[clamp(1rem,3dvh,1.5rem)]">
               <div className="flex justify-center">
-                <CheckCircle className="w-16 h-16 text-green-500" />
+                <CheckCircle className="h-[clamp(2.5rem,8dvh,4rem)] w-[clamp(2.5rem,8dvh,4rem)] text-green-500" />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-[clamp(0.5rem,1dvh,0.75rem)]">
                 <p className="text-gray-700">
                   We've sent password reset instructions to:
                 </p>
@@ -150,7 +150,7 @@ const ForgotPasswordPage: React.FC = () => {
                 </p>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-[clamp(0.5rem,1.5dvh,0.75rem)]">
                 <Button
                   onClick={() => navigate("/login")}
                   className="w-full bg-sheraton-gold hover:bg-sheraton-gold/90 text-white font-semibold py-3 rounded-md transition"

@@ -164,12 +164,12 @@ function RouteAwareFooter() {
 }
 
 function AppShell() {
-  const isLoginPage = useLocation().pathname === "/login";
+  const isViewportAuthPage = ["/login", "/forgot-password"].includes(useLocation().pathname);
 
   return (
-    <div className={`bg-background flex flex-col ${isLoginPage ? "h-[100dvh] overflow-hidden" : "min-h-screen"}`}>
+    <div className={`bg-background flex flex-col ${isViewportAuthPage ? "h-[100dvh] overflow-hidden" : "min-h-screen"}`}>
       <Header />
-      <main className={isLoginPage ? "min-h-0 flex-1 overflow-hidden" : "flex-1"}>
+      <main className={isViewportAuthPage ? "min-h-0 flex-1 overflow-hidden" : "flex-1"}>
         <Routes>
           <Route path="/" element={<RoleAwareHomePage />} />
           <Route path="/book" element={<BookingPage />} />
