@@ -55,6 +55,10 @@ import {
   getHotelOffersForManagement,
   saveHotelOffer,
   submitHotelComplaint,
+  getPublicHotelDisplayOffers,
+  getHotelDisplayOffersForManagement,
+  saveHotelDisplayOffer,
+  deleteHotelDisplayOffer,
   getPublicMenuItems,
   getPublicMenuVideo,
   requestHotelMenuAvailability,
@@ -105,6 +109,10 @@ export function createServer() {
   app.get("/api/hotel-offers/manage/access", checkHotelOfferManagementAccess);
   app.get("/api/hotel-offers/manage", getHotelOffersForManagement);
   app.post("/api/hotel-offers/manage", saveHotelOffer);
+  app.get("/api/hotel-display-offers", getPublicHotelDisplayOffers);
+  app.get("/api/hotel-display-offers/manage", getHotelDisplayOffersForManagement);
+  app.post("/api/hotel-display-offers/manage", saveHotelDisplayOffer);
+  app.delete("/api/hotel-display-offers/manage/:offerId", deleteHotelDisplayOffer);
   app.get("/api/hotel-menu-items", getPublicMenuItems);
   app.get("/api/hotel-menu-video/:attachmentId", getPublicMenuVideo);
   app.post("/api/hotel-menu-availability", requestHotelMenuAvailability);

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useHotelTenant } from "../../lib/hotelTenant";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import QuickFeedback from "../feedback/QuickFeedback";
@@ -14,12 +15,45 @@ import {
   Award,
   Shield,
   Heart,
+  Settings,
+  CircleHelp,
+  MessageSquare,
 } from "lucide-react";
 
-// DISABLED (2025-05-11): Original guest-focused Footer
-// Kept intact for future restoration. See DISABLED_FEATURES.md
-// Use ProviderFooter instead.
+export function CompactFooter({ audience }: { audience: "guest" | "staff" }) {
+  const { tenant } = useHotelTenant();
+  const isGuest = audience === "guest";
+  const links = [
+    { label: "Settings", to: "/profile", icon: Settings },
+    { label: "Help Center", to: "/concierge", icon: CircleHelp },
+    { label: "Feedback", to: "/reviews", icon: MessageSquare },
+  ];
+
+  return (
+    <footer className="bg-sheraton-navy text-white">
+      <div className="container space-y-4 py-6">
+        <nav aria-label={isGuest ? "Guest links" : "Staff support links"} className="flex w-full flex-wrap items-center justify-end gap-x-8 gap-y-2 text-sm md:pr-4">
+          {links.map(({ label, to, icon: Icon }) => (
+            <Link key={label} to={to} className="flex items-center gap-1.5 text-gray-200 transition-colors hover:text-sheraton-gold">
+              <Icon className="h-4 w-4 text-sheraton-gold" />
+              {label}
+            </Link>
+          ))}
+        </nav>
+        <div className="flex flex-col items-center gap-2 border-t border-white/15 pt-3 text-center text-xs text-gray-300 sm:flex-row sm:justify-between">
+          <span>© {new Date().getFullYear()} {tenant?.name || (isGuest ? "IvyTowers" : "Service Platform")}. All rights reserved.</span>
+          <nav aria-label="Legal links" className="flex justify-center gap-4">
+            <Link to="/privacy" className="hover:text-white">Privacy</Link>
+            <Link to="/terms" className="hover:text-white">Terms</Link>
+          </nav>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 const Footer = () => {
+  const { tenant } = useHotelTenant();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -220,7 +254,7 @@ const Footer = () => {
                 Terms of Service
               </Link>
               <span>
-                © {currentYear} Sheraton Special. All rights reserved.
+                © {currentYear} {tenant?.name || "IvyTowers"}. All rights reserved.
               </span>
             </div>
           </div>
@@ -242,6 +276,4 @@ const Footer = () => {
   );
 };
 
-// Component kept but not exported - use ProviderFooter instead
-// Uncomment below to restore guest-focused footer
-// export default Footer;
+export default Footer;

@@ -9,6 +9,7 @@ import { supabase } from "../lib/supabase";
 import { clearPendingCheckout, type ResumableMenuOrder } from "../lib/flutterwave";
 import { loadActiveMenuCart, syncActiveMenuCart } from "../lib/menuCart";
 import { useHotelTenant } from "../lib/hotelTenant";
+import { useHotelDisplayOffers } from "../hooks/useHotelDisplayOffers";
 import {
   Card,
   CardContent,
@@ -55,6 +56,7 @@ import {
 } from "lucide-react";
 
 const MenuSpecialOffer = () => {
+  const offers = useHotelDisplayOffers("menu_banner");
   const [currentTime, setCurrentTime] = useState(() => new Date());
 
   useEffect(() => {
@@ -62,33 +64,29 @@ const MenuSpecialOffer = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const hour = currentTime.getHours();
-  const offer = hour >= 11 && hour < 15
-    ? {
-        title: "Lunch Special",
-        description: "Order now and skip the queue - you come first!",
-        emoji: "🍽️",
-        endsAt: new Date(currentTime.getTime() + (15 - hour) * 60 * 60 * 1000 - currentTime.getMinutes() * 60 * 1000),
-      }
-    : hour >= 17 && hour < 23
-      ? {
-          title: "Evening Delight",
-          description: "Live jazz band + special cocktail prices",
-          emoji: "🎷",
-          endsAt: new Date(currentTime.getTime() + (23 - hour) * 60 * 60 * 1000 - currentTime.getMinutes() * 60 * 1000),
-        }
-      : null;
+  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+  const offer = offers.find((candidate) => {
+    if (!candidate.daily_start_time || !candidate.daily_end_time) return false;
+    const [startHour, startMinute] = candidate.daily_start_time.split(":").map(Number);
+    const [endHour, endMinute] = candidate.daily_end_time.split(":").map(Number);
+    const startMinutes = startHour * 60 + startMinute;
+    const endMinutes = endHour * 60 + endMinute;
+    return currentMinutes >= startMinutes && currentMinutes < endMinutes;
+  });
 
   if (!offer) return null;
 
-  const remainingTime = offer.endsAt.getTime() - currentTime.getTime();
+  const [endHour, endMinute] = (offer.daily_end_time || "00:00").split(":").map(Number);
+  const endsAt = new Date(currentTime);
+  endsAt.setHours(endHour, endMinute, 0, 0);
+  const remainingTime = endsAt.getTime() - currentTime.getTime();
 
   return (
     <Card className="mb-8 border-sheraton-gold bg-gradient-to-r from-sheraton-gold/10 to-sheraton-gold/5">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="text-4xl">{offer.emoji}</div>
+            <div className="text-4xl">{offer.emoji || ""}</div>
             <div>
               <h3 className="text-xl font-bold text-sheraton-navy">{offer.title}</h3>
               <p className="text-muted-foreground">{offer.description}</p>

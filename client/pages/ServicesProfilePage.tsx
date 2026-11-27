@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AppRole, isWorkerRole } from "../lib/roles";
+import { CompactFooter } from "../components/layout/Footer";
 import { Button } from "../components/ui/button";
 import { BillingTab } from "./components/BillingTab";
 import { supabase } from "../lib/supabase";
@@ -2376,6 +2377,7 @@ const ServicesProfilePage = () => {
           </TabsContent>
         </Tabs>
       </div>
+      {userRole !== null && <CompactFooter audience={userRole === "guest" ? "guest" : "staff"} />}
     </div>
   );
 };

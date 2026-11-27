@@ -94,35 +94,35 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8">
+    <div className="flex h-[calc(100dvh-4rem)] min-h-0 flex-col items-center overflow-y-auto bg-sheraton-cream px-4 py-[clamp(0.5rem,2dvh,1rem)] sm:px-6 lg:px-8">
+      <div className="mx-auto my-auto w-full max-w-md rounded-lg bg-card text-card-foreground shadow-lg p-[clamp(1rem,4dvh,2rem)]">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
+        <div className="text-center mb-[clamp(1rem,4dvh,2rem)]">
+          <div className="flex items-center justify-center mb-[clamp(0.5rem,2dvh,1rem)]">
             <Crown className="w-8 h-8 text-sheraton-gold" />
           </div>
-          <h1 className="text-3xl font-bold text-sheraton-navy mb-2">
+          <h1 className="text-[clamp(1.5rem,4dvh,1.875rem)] font-bold text-sheraton-navy mb-[clamp(0.25rem,1dvh,0.5rem)]">
             Welcome Back
           </h1>
-          <p className="text-gray-600">Sign in to your Sheraton account</p>
+          <p className="text-muted-foreground">Sign in to your Sheraton account</p>
         </div>
 
         {/* Error Messages */}
         {errors.submit && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-red-700 text-sm">{errors.submit}</p>
+          <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950/40">
+            <p className="text-sm text-red-700 dark:text-red-300">{errors.submit}</p>
           </div>
         )}
 
         {/* Login Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-[clamp(1rem,3dvh,1.5rem)]">
           {/* Email */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium mb-2">
+            <label htmlFor="email" className="block text-sm font-medium mb-[clamp(0.25rem,1dvh,0.5rem)]">
               Email Address
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+              <Mail className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
               <Input
                 id="email"
                 type="email"
@@ -142,11 +142,11 @@ const LoginPage: React.FC = () => {
 
           {/* Password */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-2">
+            <label htmlFor="password" className="block text-sm font-medium mb-[clamp(0.25rem,1dvh,0.5rem)]">
               Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+              <Lock className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
@@ -161,7 +161,7 @@ const LoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
               >
                 {showPassword ? (
                   <EyeOff className="w-5 h-5" />
@@ -185,11 +185,11 @@ const LoginPage: React.FC = () => {
                 onChange={handleInputChange}
                 className="rounded border-gray-300"
               />
-              <span className="ml-2 text-sm text-gray-600">Remember me</span>
+              <span className="ml-2 text-sm text-muted-foreground">Remember me</span>
             </label>
             <Link
               to="/forgot-password"
-              className="text-sm text-sheraton-gold hover:text-sheraton-navy"
+              className="text-sm text-sheraton-gold hover:text-foreground"
             >
               Forgot password?
             </Link>
@@ -206,12 +206,12 @@ const LoginPage: React.FC = () => {
         </form>
 
         {/* Sign Up Link */}
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
+        <div className="mt-[clamp(0.75rem,3dvh,1.5rem)] text-center">
+          <p className="text-muted-foreground">
             Don't have an account?{" "}
             <Link
               to={registerPath}
-              className="text-sheraton-navy font-semibold hover:underline"
+              className="font-semibold text-foreground hover:underline"
             >
               Create one here
             </Link>
