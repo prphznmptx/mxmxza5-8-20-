@@ -40,9 +40,9 @@ export function CompactFooter({ audience }: { audience: "guest" | "staff" }) {
             </Link>
           ))}
         </nav>
-        <div className="flex flex-col gap-2 border-t border-white/15 pt-3 text-xs text-gray-300 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col items-center gap-2 border-t border-white/15 pt-3 text-center text-xs text-gray-300 sm:flex-row sm:justify-between">
           <span>© {new Date().getFullYear()} {tenant?.name || (isGuest ? "IvyTowers" : "Service Platform")}. All rights reserved.</span>
-          <nav aria-label="Legal links" className="flex gap-4">
+          <nav aria-label="Legal links" className="flex justify-center gap-4">
             <Link to="/privacy" className="hover:text-white">Privacy</Link>
             <Link to="/terms" className="hover:text-white">Terms</Link>
           </nav>
