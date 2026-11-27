@@ -1071,7 +1071,7 @@ const RegisterPage: React.FC = () => {
               </div>
               {index < 4 && (
                 <div
-                  className={`h-0.5 min-w-3 flex-1 ${
+                  className={`h-0.5 w-4 shrink-0 ${
                     isCompleted ? "bg-green-500" : "bg-border"
                   }`}
                 />
