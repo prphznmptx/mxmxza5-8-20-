@@ -58,8 +58,8 @@ const ForgotPasswordPage: React.FC = () => {
   };
 
   return (
-    <div className="flex h-[calc(100dvh-4rem)] min-h-0 flex-col items-center overflow-y-auto bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-[clamp(0.5rem,2dvh,1rem)] sm:px-6 lg:px-8">
-      <div className="mx-auto my-auto w-full max-w-md rounded-lg bg-white p-[clamp(1rem,4dvh,2rem)] shadow-lg">
+    <div className="flex h-[calc(100dvh-4rem)] min-h-0 flex-col items-center overflow-y-auto bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 px-4 py-[clamp(0.5rem,2dvh,1rem)] sm:px-6 lg:px-8">
+      <div className="mx-auto my-auto w-full max-w-md rounded-lg bg-card p-[clamp(1rem,4dvh,2rem)] text-card-foreground shadow-lg">
         {/* Header */}
         <div className="text-center mb-[clamp(1rem,4dvh,2rem)]">
           <div className="flex items-center justify-center mb-[clamp(0.5rem,2dvh,1rem)]">
@@ -68,7 +68,7 @@ const ForgotPasswordPage: React.FC = () => {
           <h1 className="text-[clamp(1.5rem,4dvh,1.875rem)] font-bold text-sheraton-navy mb-[clamp(0.25rem,1dvh,0.5rem)]">
             Reset Password
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             {step === "email"
               ? "Enter your email to receive password reset instructions"
               : "Check your email for further instructions"}
@@ -79,8 +79,8 @@ const ForgotPasswordPage: React.FC = () => {
           <>
             {/* Error Messages */}
             {errors.submit && (
-              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-red-700 text-sm">{errors.submit}</p>
+              <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950/40">
+                <p className="text-sm text-red-700 dark:text-red-300">{errors.submit}</p>
               </div>
             )}
 
@@ -92,7 +92,7 @@ const ForgotPasswordPage: React.FC = () => {
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                  <Mail className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
@@ -121,7 +121,7 @@ const ForgotPasswordPage: React.FC = () => {
             <div className="mt-[clamp(0.75rem,3dvh,1.5rem)]">
               <Link
                 to="/login"
-                className="flex items-center justify-center text-sheraton-navy hover:text-sheraton-gold transition"
+                className="flex items-center justify-center text-foreground transition hover:text-sheraton-gold"
               >
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to login
@@ -137,14 +137,14 @@ const ForgotPasswordPage: React.FC = () => {
               </div>
 
               <div className="space-y-[clamp(0.5rem,1dvh,0.75rem)]">
-                <p className="text-gray-700">
+                <p className="text-muted-foreground">
                   We've sent password reset instructions to:
                 </p>
-                <p className="font-semibold text-sheraton-navy">{email}</p>
+                <p className="font-semibold text-foreground">{email}</p>
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                <p className="text-sm text-blue-900">
+              <div className="rounded-md border border-blue-200 bg-blue-50 p-4 dark:border-blue-900 dark:bg-blue-950/40">
+                <p className="text-sm text-blue-900 dark:text-blue-200">
                   Please check your email (including spam folder) for a link to
                   reset your password. The link will expire in 24 hours.
                 </p>
@@ -163,7 +163,7 @@ const ForgotPasswordPage: React.FC = () => {
                     setStep("email");
                     setEmail("");
                   }}
-                  className="w-full text-sheraton-navy hover:text-sheraton-gold font-medium transition"
+                  className="w-full text-foreground font-medium transition hover:text-sheraton-gold"
                 >
                   Try a different email
                 </button>
