@@ -273,7 +273,7 @@ const RegisterPage: React.FC = () => {
         <h2 className="text-2xl font-bold text-sheraton-navy mb-2">
           Choose Your Account Type
         </h2>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Select the role that best describes you to personalize your experience
         </p>
       </div>
@@ -294,12 +294,12 @@ const RegisterPage: React.FC = () => {
           className={`p-6 rounded-lg border-2 transition-all ${
             formData.role === "guest"
               ? "border-sheraton-gold bg-sheraton-cream"
-              : "border-gray-200 bg-white hover:border-sheraton-gold"
+              : "border-border bg-card hover:border-sheraton-gold"
           }`}
         >
           <div className="text-4xl mb-3">👤</div>
           <h3 className="font-bold text-sheraton-navy mb-2">Guest</h3>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             I'm a guest booking a stay or dining experience
           </p>
           {formData.role === "guest" && (
@@ -322,12 +322,12 @@ const RegisterPage: React.FC = () => {
           className={`p-6 rounded-lg border-2 transition-all ${
             formData.role === "manager"
               ? "border-sheraton-gold bg-sheraton-cream"
-              : "border-gray-200 bg-white hover:border-sheraton-gold"
+              : "border-border bg-card hover:border-sheraton-gold"
           }`}
         >
           <div className="text-4xl mb-3">👔</div>
           <h3 className="font-bold text-sheraton-navy mb-2">Manager</h3>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             I manage hotel operations and teams
           </p>
           {formData.role === "manager" && (
@@ -347,12 +347,12 @@ const RegisterPage: React.FC = () => {
           className={`p-6 rounded-lg border-2 transition-all ${
             formData.role === "worker"
               ? "border-sheraton-gold bg-sheraton-cream"
-              : "border-gray-200 bg-white hover:border-sheraton-gold"
+              : "border-border bg-card hover:border-sheraton-gold"
           }`}
         >
           <div className="text-4xl mb-3">🔧</div>
           <h3 className="font-bold text-sheraton-navy mb-2">Worker</h3>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             I provide services (internal staff or external vendor)
           </p>
           {formData.role === "worker" && (
@@ -378,7 +378,7 @@ const RegisterPage: React.FC = () => {
                   serviceType: e.target.value,
                 }))
               }
-              className="w-full px-3 py-2 border rounded-md border-gray-300"
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-foreground"
             />
             {errors.serviceType && (
               <p className="text-red-500 text-sm">{errors.serviceType}</p>
@@ -395,7 +395,7 @@ const RegisterPage: React.FC = () => {
                   serviceCategory: e.target.value as "internal" | "external" | "",
                 }))
               }
-              className="w-full px-3 py-2 border rounded-md border-gray-300"
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-foreground"
             >
               <option value="">Select category</option>
               <option value="internal">Internal Staff</option>
@@ -416,7 +416,7 @@ const RegisterPage: React.FC = () => {
                   menuAccessRole: e.target.value as "none" | "chef" | "food_beverage_manager",
                 }))
               }
-              className="w-full px-3 py-2 border rounded-md border-gray-300"
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-foreground"
             >
               <option value="none">No menu management access</option>
               <option value="chef">Chef / Culinary Staff</option>
@@ -430,7 +430,7 @@ const RegisterPage: React.FC = () => {
       )}
 
       {errors.role && (
-        <p className="text-red-500 text-sm text-center bg-red-50 p-3 rounded">
+        <p className="rounded bg-red-50 p-3 text-center text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300">
           {errors.role}
         </p>
       )}
@@ -443,7 +443,7 @@ const RegisterPage: React.FC = () => {
         <h2 className="text-2xl font-bold text-sheraton-navy mb-2">
           Create Your Special Account
         </h2>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Join the Sheraton Special family and unlock exclusive privileges
         </p>
       </div>
@@ -463,7 +463,7 @@ const RegisterPage: React.FC = () => {
             id="hotelStarRating"
             value={formData.hotelStarRating}
             onChange={(e) => setFormData((prev) => ({ ...prev, hotelStarRating: e.target.value }))}
-            className="w-full px-3 py-2 border rounded-md border-gray-300"
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-foreground"
           >
             <option value="">Not classified / not applicable</option>
             {[1, 2, 3, 4, 5].map((rating) => (
@@ -476,7 +476,7 @@ const RegisterPage: React.FC = () => {
             id="taxEntityType"
             value={formData.taxEntityType}
             onChange={(e) => setFormData((prev) => ({ ...prev, taxEntityType: e.target.value }))}
-            className="w-full px-3 py-2 border rounded-md border-gray-300"
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-foreground"
           >
             <option value="">Select later</option>
             {taxEntityTypes.map((entityType) => <option key={entityType.value} value={entityType.value}>{entityType.label}</option>)}
@@ -502,7 +502,7 @@ const RegisterPage: React.FC = () => {
               id="taxEntityType"
               value={formData.taxEntityType}
               onChange={(e) => setFormData((prev) => ({ ...prev, taxEntityType: e.target.value }))}
-              className="w-full px-3 py-2 border rounded-md border-gray-300"
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-foreground"
             >
               <option value="">Select later</option>
               {taxEntityTypes.map((entityType) => <option key={entityType.value} value={entityType.value}>{entityType.label}</option>)}
@@ -613,7 +613,7 @@ const RegisterPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               {showPassword ? (
                 <EyeOff className="h-4 w-4" />
@@ -646,7 +646,7 @@ const RegisterPage: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               {showConfirmPassword ? (
                 <EyeOff className="h-4 w-4" />
@@ -717,7 +717,7 @@ const RegisterPage: React.FC = () => {
         <h2 className="text-2xl font-bold text-sheraton-navy mb-2">
           Personalize Your Experience
         </h2>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Help us tailor your stay to your preferences
         </p>
       </div>
@@ -851,7 +851,7 @@ const RegisterPage: React.FC = () => {
               className={`p-2 text-sm rounded-lg border transition-colors ${
                 formData.interests.includes(interest)
                   ? "bg-sheraton-gold text-sheraton-navy border-sheraton-gold"
-                  : "bg-white text-gray-700 border-gray-200 hover:border-sheraton-gold"
+                  : "bg-card text-foreground border-border hover:border-sheraton-gold"
               }`}
             >
               {interest}
@@ -878,7 +878,7 @@ const RegisterPage: React.FC = () => {
       </div>
 
       {/* Communication Preferences */}
-      <div className="bg-gray-50 rounded-lg p-6">
+      <div className="bg-muted/50 rounded-lg p-6">
         <h3 className="text-lg font-semibold text-sheraton-navy mb-4">
           Communication Preferences
         </h3>
@@ -886,7 +886,7 @@ const RegisterPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <span className="font-medium">Email Notifications</span>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Booking confirmations and updates
               </p>
             </div>
@@ -903,7 +903,7 @@ const RegisterPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <span className="font-medium">SMS Notifications</span>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Important alerts and reminders
               </p>
             </div>
@@ -917,7 +917,7 @@ const RegisterPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <span className="font-medium">Marketing Emails</span>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Special offers and promotions
               </p>
             </div>
@@ -928,7 +928,7 @@ const RegisterPage: React.FC = () => {
               }
             />
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Hotel rewards are managed separately by each property. You can choose to enroll in available hotel programs from your profile.
           </p>
           <div className="space-y-2 pt-2">
@@ -941,7 +941,7 @@ const RegisterPage: React.FC = () => {
               placeholder="Enter a referral code"
               maxLength={32}
             />
-            <p className="text-sm text-gray-600">A qualified referral earns points after the new member completes an eligible milestone.</p>
+            <p className="text-sm text-muted-foreground">A qualified referral earns points after the new member completes an eligible milestone.</p>
           </div>
         </div>
       </div>
@@ -954,7 +954,7 @@ const RegisterPage: React.FC = () => {
         <h2 className="text-2xl font-bold text-sheraton-navy mb-2">
           Verify Your Account
         </h2>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           We've sent a verification code to {formData.email}
         </p>
       </div>
@@ -979,16 +979,16 @@ const RegisterPage: React.FC = () => {
       </div>
 
       {signupError && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start space-x-3">
+        <div className="flex items-start space-x-3 rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950/40">
           <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
           <div className="text-left">
-            <p className="font-medium text-red-800">Registration Failed</p>
-            <p className="text-red-700 text-sm">{signupError}</p>
+            <p className="font-medium text-red-800 dark:text-red-200">Registration Failed</p>
+            <p className="text-sm text-red-700 dark:text-red-300">{signupError}</p>
           </div>
         </div>
       )}
 
-      <div className="text-sm text-gray-600">
+      <div className="text-sm text-muted-foreground">
         <p>Didn't receive the code? Check your spam folder or</p>
         <button className="text-sheraton-navy underline hover:no-underline">
           use a different email address
@@ -999,15 +999,15 @@ const RegisterPage: React.FC = () => {
 
   const renderComplete = () => (
     <div className="space-y-6 text-center">
-      <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-        <CheckCircle className="h-10 w-10 text-green-600" />
+      <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-950/50">
+        <CheckCircle className="h-10 w-10 text-green-600 dark:text-green-400" />
       </div>
 
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-sheraton-navy mb-2">
           Welcome to Sheraton Special!
         </h2>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Your account has been created successfully
         </p>
       </div>
@@ -1028,7 +1028,7 @@ const RegisterPage: React.FC = () => {
   );
 
   const renderStepIndicator = () => (
-    <div className="flex items-center justify-center space-x-4 mb-8 flex-wrap">
+    <div className="mb-8 grid grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-3 md:grid-cols-5">
       {[
         { id: "role", label: "Account Type", icon: Shield },
         { id: "info", label: "Account Info", icon: User },
@@ -1046,32 +1046,25 @@ const RegisterPage: React.FC = () => {
             ["role", "info", "preferences", "verification"].includes(stepItem.id));
 
         return (
-          <div key={stepItem.id} className="flex items-center">
+          <div key={stepItem.id} className="flex min-w-0 flex-col items-center gap-2 text-center">
             <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center ${
+              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
                 isCompleted
                   ? "bg-green-500 text-white"
                   : isActive
                     ? "bg-sheraton-gold text-sheraton-navy"
-                    : "bg-gray-200 text-gray-500"
+                    : "bg-muted text-muted-foreground"
               }`}
             >
               <stepItem.icon className="h-5 w-5" />
             </div>
             <span
-              className={`ml-2 text-sm font-medium ${
-                isActive ? "text-sheraton-navy" : "text-gray-500"
+              className={`text-xs font-medium leading-tight sm:text-sm ${
+                isActive ? "text-foreground" : "text-muted-foreground"
               }`}
             >
               {stepItem.label}
             </span>
-            {index < 4 && (
-              <div
-                className={`w-8 h-0.5 mx-4 ${
-                  isCompleted ? "bg-green-500" : "bg-gray-200"
-                }`}
-              />
-            )}
           </div>
         );
       })}
@@ -1079,12 +1072,12 @@ const RegisterPage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sheraton-cream via-white to-sheraton-pearl">
+    <div className="min-h-screen bg-sheraton-cream">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           {step !== "complete" && renderStepIndicator()}
 
-          <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="rounded-xl bg-card p-8 text-card-foreground shadow-lg">
             {step === "role" && renderRoleSelection()}
             {step === "info" && renderPersonalInfo()}
             {step === "preferences" && renderPreferences()}
@@ -1132,7 +1125,7 @@ const RegisterPage: React.FC = () => {
 
           {step === "role" && (
             <div className="text-center mt-6">
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Already have an account?{" "}
                 <Link
                   to={returnTo === "/profile" ? "/login" : `/login?returnTo=${encodeURIComponent(returnTo)}`}
